@@ -16,34 +16,28 @@ class MainPresenter(val repository: Repository, val imageUtil: ImageUtil) : IMai
     private val apiInteractor = ApiInteractor()
     private var isLocationUpdating = true
 
-    override fun reportFire() {
-        GlobalScope.launch {
-            val report = apiInteractor.reportFire(repository.userId)
-            if (!report.error.isNullOrEmpty())
-                view?.onError(report.error ?: "Unknown")
-            else
-                view?.onFireReported(report.reportId)
-        }
-    }
-
     override fun registerUser() {
         GlobalScope.launch {
-            val user = apiInteractor.registerUser()
-            repository.userId = user.userId ?: ""
-            if (!user.error.isNullOrEmpty())
-                view?.onError(user.error ?: "Unknown")
-            else
-                view?.onUserRegistered(user.userId)
+            try {
+                val user = apiInteractor.registerUser()
+                repository.userId = user.userId ?: ""
+                if (!user.error.isNullOrEmpty())
+                    view?.onError(user.error ?: "Unknown")
+                else
+                    view?.onUserRegistered(user.userId)
+            } catch (ex: Exception) {handleUncaughtError()}
         }
     }
 
     override fun updateProfile(name: String, phone: String) {
         GlobalScope.launch {
-            val response = apiInteractor.updateProfile(repository.userId, name, phone)
-            if (!response.error.isNullOrEmpty())
-                view?.onError(response.error ?: "Unknown")
-            else
-                view?.onProfileUpdated()
+            try {
+                val response = apiInteractor.updateProfile(repository.userId, name, phone)
+                if (!response.error.isNullOrEmpty())
+                    view?.onError(response.error ?: "Unknown")
+                else
+                    view?.onProfileUpdated()
+            } catch (ex: Exception) {handleUncaughtError()}
         }
     }
 
@@ -57,17 +51,6 @@ class MainPresenter(val repository: Repository, val imageUtil: ImageUtil) : IMai
         }
     }
 
-    override fun uploadImage(uri: Uri) {
-        GlobalScope.launch(Dispatchers.IO) {
-            val path = imageUtil.readToLocal(uri)
-            val response = apiInteractor.uploadImage(repository.userId, path)
-            if (!response.error.isNullOrEmpty())
-                view?.onError(response.error ?: "Unknown")
-            else
-                view?.onImageUploaded()
-        }
-    }
-
     override fun stopUpdateLocation() {
         isLocationUpdating = false
     }
@@ -78,5 +61,9 @@ class MainPresenter(val repository: Repository, val imageUtil: ImageUtil) : IMai
 
     override fun detachView() {
         view = null
+    }
+
+    private fun handleUncaughtError() {
+        view?.onError("Uncaught Error")
     }
 }

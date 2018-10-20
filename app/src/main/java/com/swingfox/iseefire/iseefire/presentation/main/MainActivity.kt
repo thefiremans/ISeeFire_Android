@@ -11,6 +11,7 @@ import android.util.Log
 import com.swingfox.iseefire.iseefire.R
 import com.swingfox.iseefire.iseefire.domain.LocationService
 import com.swingfox.iseefire.iseefire.presentation.ISeeFireApplication
+import com.swingfox.iseefire.iseefire.presentation.report.ReportActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
@@ -18,8 +19,7 @@ import kotlinx.coroutines.experimental.launch
 
 class MainActivity : AppCompatActivity(), IMainView {
 
-    private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1001
-
+    private val REPORT_REQUEST_CODE = 1002
     val presenter = MainPresenter(ISeeFireApplication.instance.repository, ISeeFireApplication.instance.imageUtil)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,23 +27,14 @@ class MainActivity : AppCompatActivity(), IMainView {
         presenter.attachView(this)
         presenter.registerUser()
         presenter.updateLocation(LocationService(this))
-        report_Button.setOnClickListener { presenter.reportFire() }
-        gallery_Button.setOnClickListener { selectImageInAlbum() }
+        report_Button.setOnClickListener { startActivityForResult(ReportActivity.intent(this), REPORT_REQUEST_CODE) }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
-            Log.e("TAG", "REQUEST_CODE $requestCode")
             when (requestCode) {
-                REQUEST_SELECT_IMAGE_IN_ALBUM -> {
-                    data?.clipData?.let { clipData ->
-                        (0 until clipData.itemCount).mapNotNull { clipData.getItemAt(it).uri }.forEach { uri ->
-                            presenter.uploadImage(uri)
-                        }
-                    }
-                    data?.data?.let { uri -> presenter.uploadImage(uri) }
-                }
+                REPORT_REQUEST_CODE -> showReportSuccess()
             }
         }
     }
@@ -53,12 +44,6 @@ class MainActivity : AppCompatActivity(), IMainView {
         presenter.stopUpdateLocation()
         presenter.detachView()
         super.onDestroy()
-    }
-
-    override fun onFireReported(reportId: Int?) {
-        GlobalScope.launch(Dispatchers.Main) {
-            report_TextView.text = "Fire id is ${reportId ?: 0}"
-        }
     }
 
     override fun onUserRegistered(userId: String?) {
@@ -79,13 +64,6 @@ class MainActivity : AppCompatActivity(), IMainView {
         }
     }
 
-    override fun onImageUploaded() {
-        GlobalScope.launch(Dispatchers.Main) {
-            val snackbar = Snackbar.make(root_layout, "Image uploaded", Snackbar.LENGTH_LONG)
-            snackbar.view.setBackgroundColor(Color.BLUE)
-            snackbar.show()
-        }
-    }
 
     override fun onError(error: String) {
         GlobalScope.launch(Dispatchers.Main) {
@@ -95,11 +73,15 @@ class MainActivity : AppCompatActivity(), IMainView {
         }
     }
 
-    private fun selectImageInAlbum() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT)
-        intent.type = "image/*"
-        if (intent.resolveActivity(packageManager) != null) {
-            startActivityForResult(intent, REQUEST_SELECT_IMAGE_IN_ALBUM)
+    private fun showReportSuccess() {
+        GlobalScope.launch(Dispatchers.Main) {
+            val snackbar = Snackbar.make(
+                root_layout,
+                "Your report was successfuly uploaded. \n Thank you for your help",
+                Snackbar.LENGTH_LONG
+            )
+            snackbar.view.setBackgroundColor(Color.BLUE)
+            snackbar.show()
         }
     }
 

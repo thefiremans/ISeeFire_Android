@@ -7,8 +7,6 @@ import com.swingfox.iseefire.iseefire.presentation.base.IBasePresenter
 import com.swingfox.iseefire.iseefire.presentation.base.IBaseView
 
 interface IMainPresenter: IBasePresenter<IMainView> {
-    fun reportFire()
-
     fun registerUser()
 
     fun updateProfile(name: String, phone: String)
@@ -16,20 +14,13 @@ interface IMainPresenter: IBasePresenter<IMainView> {
     fun updateLocation(locationService: LocationService)
 
     fun stopUpdateLocation()
-
-    fun uploadImage(path: Uri)
 }
 
 interface IMainView: IBaseView {
-    fun onImageUploaded()
-
-    fun onFireReported(fireId: Int?)
 
     fun onUserRegistered(userId: String?)
 
     fun onProfileUpdated()
-
-    fun onError(error: String)
 
     fun onLocationUpdated(location: Location)
 }

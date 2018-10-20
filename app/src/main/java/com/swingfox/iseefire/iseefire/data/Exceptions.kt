@@ -22,14 +22,6 @@ class ApiException(
     companion object {
         const val CODE_UNKNOWN = "unknown"
         const val CODE_INVALID_RESPONSE = "invalid_response"
-        const val CODE_PROFILE_DELETED = "profile_deleted"
-        const val CODE_WRONG_DATA = "wrong_data"
-
-        fun invalidResponse(): ApiException {
-            return ApiException(CODE_INVALID_RESPONSE)
-        }
-
-
     }
 }
 
@@ -48,7 +40,7 @@ suspend inline fun <T : Any> Call<T>.awaitResponse(): T {
                             status = status
                         )
                     } catch (e: Exception) {
-                        return ApiException("0")
+                        return ApiException(ApiException.CODE_UNKNOWN)
                     }
 
                 }

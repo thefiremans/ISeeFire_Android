@@ -10,18 +10,26 @@ open class BaseResponse {
     @SerializedName("error")
     val error: String? = null
 }
-class RegisterResponse: BaseResponse() {
+
+class RegisterResponse : BaseResponse() {
     @SerializedName("secretUserId")
     val userId: String? = null
 }
 
-class ReportFireResponse: BaseResponse() {
+class ReportFireResponse : BaseResponse() {
     @SerializedName("reportId")
     val reportId: Int? = null
 }
 
 data class ImageRequest(val SecretUserId: String)
 
-class UpdateProfileResponse: BaseResponse() {
+data class NearbyFiresRequest(
+    val SecretUserId: String,
+    val Latitude: Double,
+    val Longitude: Double,
+    val Distance: Double
+)
 
-}
+class NearbyFiresResponse: BaseResponse()
+
+class UpdateProfileResponse : BaseResponse()

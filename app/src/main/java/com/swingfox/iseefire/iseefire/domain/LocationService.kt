@@ -28,11 +28,7 @@ class LocationService(val activity: Activity) {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 if (location!=null){
-
-                    val jsonObject = JSONObject()
-                    jsonObject.put("latitude",location.latitude)
-                    jsonObject.put("longitude",location.longitude)
-
+                    onLocation(location)
                 } else {
                     Log.e("TAG","location is null")
                 }

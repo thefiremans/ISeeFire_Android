@@ -6,4 +6,6 @@ interface IBasePresenter<T: IBaseView> {
     fun detachView()
 }
 
-interface IBaseView
+interface IBaseView {
+    fun onError(error: String)
+}

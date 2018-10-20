@@ -15,26 +15,23 @@ class ApiInteractor {
     private val dispatcher = newFixedThreadPoolContext(2, "PopupRepository")
 
     suspend fun reportFire(userId: String): ReportFireResponse = withContext(dispatcher) {
-        val fireResponse = api.reportTheFire(ReportFireRequest(userId)).awaitResponse()
-        return@withContext fireResponse
+        return@withContext api.reportTheFire(ReportFireRequest(userId)).awaitResponse()
     }
 
     suspend fun registerUser(): RegisterResponse = withContext(dispatcher) {
-        val register = api.registerUser().awaitResponse()
-        return@withContext register
+        return@withContext api.registerUser().awaitResponse()
     }
 
     suspend fun updateProfile(userId: String, name: String, phone: String): UpdateProfileResponse =
         withContext(dispatcher) {
-            val updateProfileResponse = api.updateProfile(UpdateProfileRequest(userId, name, phone)).awaitResponse()
-            return@withContext updateProfileResponse
+            return@withContext api.updateProfile(UpdateProfileRequest(userId, name, phone)).awaitResponse()
         }
 
-    suspend fun uploadImage(userId: String, path: String): BaseResponse = withContext(dispatcher) {
+    suspend fun uploadImage(userId: String, reportId: String, path: String): BaseResponse = withContext(dispatcher) {
         val body = RequestBody.create(MediaType.parse("image/jpg"), File(path))
         val part = MultipartBody.Part.createFormData("Image", "image.jpg", body)
         val userIdPart = MultipartBody.Part.createFormData("SecretUserId", userId)
-        val reportId = MultipartBody.Part.createFormData("ReportId", "10")
+        val reportId = MultipartBody.Part.createFormData("ReportId", reportId)
         return@withContext api.uploadImage(userIdPart, reportId, part).awaitResponse()
     }
 

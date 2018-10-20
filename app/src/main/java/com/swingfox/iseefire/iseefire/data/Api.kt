@@ -18,6 +18,9 @@ interface Api {
     @POST("User/UpdateProfile")
     fun updateProfile(@Body updateProfile: UpdateProfileRequest): Call<UpdateProfileResponse>
 
+    @POST("Fire/GetNearbyFires")
+    fun getNearbyFires(@Body nearbyFires: NearbyFiresRequest): Call<NearbyFiresResponse>
+
     @POST("Upload/UploadImage")
     @Multipart
     fun uploadImage(@Part userId: MultipartBody.Part, @Part reportId: MultipartBody.Part, @Part image: MultipartBody.Part): Call<BaseResponse>
