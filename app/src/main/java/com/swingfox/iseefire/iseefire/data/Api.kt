@@ -19,7 +19,7 @@ interface Api {
     fun updateProfile(@Body updateProfile: UpdateProfileRequest): Call<UpdateProfileResponse>
 
     @POST("Fire/GetNearbyFires")
-    fun getNearbyFires(@Body nearbyFires: NearbyFiresRequest): Call<NearbyFiresResponse>
+    fun getNearbyFires(@Body nearbyFires: NearbyFiresRequest): Call<List<Fire>>
 
     @POST("Upload/UploadImage")
     @Multipart

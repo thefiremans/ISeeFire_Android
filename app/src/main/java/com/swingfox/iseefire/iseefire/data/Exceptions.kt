@@ -18,7 +18,7 @@ class ApiException(
     val code: String,
     val status: Int = -1,
     override val message: String = code
-) : RuntimeException() {
+) : java.lang.Exception() {
     companion object {
         const val CODE_UNKNOWN = "unknown"
         const val CODE_INVALID_RESPONSE = "invalid_response"

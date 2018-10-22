@@ -10,7 +10,7 @@ import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.bumptech.glide.Glide
 import com.swingfox.iseefire.iseefire.R
-import com.swingfox.iseefire.iseefire.presentation.ISeeFireApplication
+import com.swingfox.iseefire.iseefire.ISeeFireApplication
 import com.swingfox.iseefire.iseefire.util.ImageUtil
 import kotlinx.android.synthetic.main.activity_report.*
 import kotlinx.coroutines.experimental.Dispatchers
@@ -22,14 +22,18 @@ class ReportActivity : AppCompatActivity(), IReportView {
     private val REQUEST_SELECT_IMAGE_IN_ALBUM = 1001
     private val presenter = ReportPresenter(ISeeFireApplication.instance.repository, ImageUtil(this))
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_report)
         presenter.attachView(this)
-        report_Button.setOnClickListener { presenter.reportFire("Test Comment") }
+        report_Button.setOnClickListener {
+            presenter.reportFire(
+                intent.getDoubleExtra(LATITUDE, 0.0), intent.getDoubleExtra(
+                    LONGITUDE, 0.0
+                ), 500.0, commentTextView.text?.toString() ?: ""
+            )
+        }
         gallery_Button.setOnClickListener { selectImageInAlbum() }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -81,7 +85,13 @@ class ReportActivity : AppCompatActivity(), IReportView {
     }
 
     companion object {
-        fun intent(context: Context) = Intent(context, ReportActivity::class.java)
-
+        private val LATITUDE = "latitude"
+        private val LONGITUDE = "longitude"
+        fun intent(context: Context, latitude: Double, longitude: Double): Intent {
+            val intent = Intent(context, ReportActivity::class.java)
+            intent.putExtra(LATITUDE, latitude)
+            intent.putExtra(LONGITUDE, longitude)
+            return intent
+        }
     }
 }

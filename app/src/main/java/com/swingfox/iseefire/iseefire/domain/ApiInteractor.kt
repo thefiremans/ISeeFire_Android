@@ -12,10 +12,10 @@ import java.io.File
 class ApiInteractor {
 
     private val api = ApiProvider().api
-    private val dispatcher = newFixedThreadPoolContext(2, "PopupRepository")
+    private val dispatcher = newFixedThreadPoolContext(3, "ApiInteractor")
 
-    suspend fun reportFire(userId: String): ReportFireResponse = withContext(dispatcher) {
-        return@withContext api.reportTheFire(ReportFireRequest(userId)).awaitResponse()
+    suspend fun reportFire(userId: String, latitude: Double, longitude: Double, distance: Double, text: String): ReportFireResponse = withContext(dispatcher) {
+        return@withContext api.reportTheFire(ReportFireRequest(userId, latitude, longitude, text, distance)).awaitResponse()
     }
 
     suspend fun registerUser(): RegisterResponse = withContext(dispatcher) {
@@ -34,5 +34,11 @@ class ApiInteractor {
         val reportId = MultipartBody.Part.createFormData("ReportId", reportId)
         return@withContext api.uploadImage(userIdPart, reportId, part).awaitResponse()
     }
+
+    suspend fun getNearbyFires(userId: String, latitude: Double, longitude: Double, distance: Double): List<Fire> = withContext(dispatcher) {
+        return@withContext api.getNearbyFires(NearbyFiresRequest(userId, latitude, longitude, distance)).awaitResponse()
+    }
+
+
 
 }

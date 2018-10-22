@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ISeeFire</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiZ2xlYnN2aXJpcGEiLCJhIjoiY2prOGR2NjVjMmMzbjNqcnlvY3Q5MmV5diJ9.HBSEUlkOfZVTm1_nb2yIUA</string>
 </resources>

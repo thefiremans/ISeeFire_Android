@@ -15,15 +15,20 @@ class ReportPresenter(val repository: Repository, val imageUtil: ImageUtil) : IR
 
     private var imagePath: Uri? = null
 
-    override fun reportFire(comment: String) {
+    override fun reportFire(latitude: Double, longitude: Double, distance: Double, text: String) {
         GlobalScope.launch {
-            val report = apiInteractor.reportFire(repository.userId)
-            if (!report.error.isNullOrEmpty())
-                view?.onError(report.error ?: "Unknown error")
-            else if (imagePath != null) {
-                uploadImage(report.reportId ?: 0)
-            } else
-                view?.onFireReported(report.reportId ?: 0)
+            try {
+                val report = apiInteractor.reportFire(repository.userId, latitude, longitude, distance, text)
+                if (!report.error.isNullOrEmpty())
+                    view?.onError(report.error ?: "Unknown error")
+                else if (imagePath != null) {
+                    uploadImage(report.reportId ?: 0)
+                } else
+                    view?.onFireReported(report.reportId ?: 0)
+            } catch (ex: Exception) {
+                handleUncaughtError()
+            }
+
         }
     }
 

@@ -1,7 +1,7 @@
-package com.swingfox.iseefire.iseefire.presentation
+package com.swingfox.iseefire.iseefire
 
 import android.app.Application
-import com.bumptech.glide.Glide
+import com.mapbox.mapboxsdk.Mapbox
 import com.swingfox.iseefire.iseefire.domain.Repository
 import com.swingfox.iseefire.iseefire.util.ImageUtil
 import com.swingfox.iseefire.iseefire.util.PreferenceUtil
@@ -15,6 +15,7 @@ class ISeeFireApplication: Application() {
         repository = Repository(PreferenceUtil(this))
         imageUtil = ImageUtil(this)
         instance = this
+        Mapbox.getInstance(getApplicationContext(), getString(R.string.mapbox_access_token));
     }
 
     companion object {
