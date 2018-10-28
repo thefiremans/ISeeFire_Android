@@ -1,5 +1,6 @@
 package com.swingfox.iseefire.iseefire.presentation.main
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
@@ -23,6 +24,7 @@ import com.swingfox.iseefire.iseefire.domain.LocationService
 import com.swingfox.iseefire.iseefire.ISeeFireApplication
 import com.swingfox.iseefire.iseefire.data.Fire
 import com.swingfox.iseefire.iseefire.presentation.report.ReportActivity
+import com.swingfox.iseefire.iseefire.util.checkAndRequestPermission
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.experimental.Dispatchers
 import kotlinx.coroutines.experimental.GlobalScope
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity(), IMainView, OnMapReadyCallback {
         presenter.attachView(this)
         showProgress()
         presenter.registerUser()
+        requestPermissions()
         report_Button.setOnClickListener {
             startActivityForResult(
                 ReportActivity.intent(
@@ -61,6 +64,7 @@ class MainActivity : AppCompatActivity(), IMainView, OnMapReadyCallback {
             presenter.getNearbyFires()
         }
         callButton.setOnClickListener {
+            if(!checkAndRequestPermission(this, Manifest.permission.CALL_PHONE)) return@setOnClickListener
             val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:" + "112"))
             startActivity(intent)
         }
@@ -101,11 +105,10 @@ class MainActivity : AppCompatActivity(), IMainView, OnMapReadyCallback {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK)
             when (requestCode) {
                 REPORT_REQUEST_CODE -> showReportSuccess()
             }
-        }
     }
 
 
@@ -121,7 +124,7 @@ class MainActivity : AppCompatActivity(), IMainView, OnMapReadyCallback {
     override fun onUserRegistered(userId: String?) {
         GlobalScope.launch(Dispatchers.Main) {
             hideProgress()
-            val snackbar = Snackbar.make(root_layout, "User authentication success ", Snackbar.LENGTH_LONG)
+            val snackbar = Snackbar.make(root_layout, "User authentication success", Snackbar.LENGTH_LONG)
             snackbar.view.setBackgroundColor(Color.BLUE)
             snackbar.show()
             mapView?.getMapAsync(this@MainActivity)
@@ -130,7 +133,7 @@ class MainActivity : AppCompatActivity(), IMainView, OnMapReadyCallback {
 
     override fun onProfileUpdated() {
         GlobalScope.launch(Dispatchers.Main) {
-            val snackbar = Snackbar.make(root_layout, "Profile updating success ", Snackbar.LENGTH_LONG)
+            val snackbar = Snackbar.make(root_layout, "Profile updating success", Snackbar.LENGTH_LONG)
             snackbar.view.setBackgroundColor(Color.BLUE)
             snackbar.show()
         }
@@ -156,10 +159,10 @@ class MainActivity : AppCompatActivity(), IMainView, OnMapReadyCallback {
             isZoomGesturesEnabled = true
             isTiltGesturesEnabled = false
         }
-        val locationComponent = mapboxMap?.locationComponent
-        if (locationService.checkLocationPermission())
-            mapView?.let {
-                locationLayerPlugin = LocationLayerPlugin(it, mapboxMap).also {
+        val locationComponent = mapboxMap.locationComponent
+        if (checkAndRequestPermission(this, Manifest.permission.ACCESS_FINE_LOCATION))
+            mapView?.let { mapView ->
+                locationLayerPlugin = LocationLayerPlugin(mapView, mapboxMap).also {
                     it.renderMode = RenderMode.NORMAL
                 }
             }
@@ -208,6 +211,14 @@ class MainActivity : AppCompatActivity(), IMainView, OnMapReadyCallback {
 
     private fun hideProgress() {
         progressBarLayout.visibility = View.GONE
+    }
+
+    private fun requestPermissions() {
+        checkAndRequestPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        checkAndRequestPermission(this, Manifest.permission.CAMERA)
+        checkAndRequestPermission(this, Manifest.permission.CALL_PHONE)
+        checkAndRequestPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
     }
 
 
