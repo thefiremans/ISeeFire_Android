@@ -194,7 +194,7 @@ class MainActivity : AppCompatActivity(), IMainView, OnMapReadyCallback {
         GlobalScope.launch(Dispatchers.Main) {
             val snackbar = Snackbar.make(
                 root_layout,
-                "Your report was successfuly uploaded. \n Thank you for your help",
+                "Your report was successfully uploaded. \n Thank you for your help",
                 Snackbar.LENGTH_LONG
             )
             snackbar.view.setBackgroundColor(Color.BLUE)
